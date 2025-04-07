@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(to right, #f44e5f, #f9a826);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        main {
+            padding: 40px 20px;
+        }
+
+        .form-section {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #f44e5f;
+            color: white;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        button:hover {
+            background-color: #f9a826;
+        }
+
+        .resume-output {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+
+        #resumeDetails img {
+            max-width: 100px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .resume-heading {
+            font-size: 1.5rem;
+            color: #f44e5f;
+            margin-bottom: 10px;
+        }
+
+        .resume-text {
+            font-size: 1.2rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+        }
+
+        .photo-preview {
+            margin-top: 10px;
+            max-width: 100px;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .template-selector {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .template-option {
+            width: 200px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .template-option img {
+            width: 100%;
+            height: auto;
+        }
+
+        .template-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .selected-template {
+            border: 4px solid #f44e5f;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Create Your Resume</h1>
+    </header>
+    <main>
+        <section class="form-section">
+            <h2>Personal Information</h2>
+            <form id="resumeForm">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" placeholder="Your Full Name" required>
+
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" placeholder="Your Email" required>
+
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" name="phone" placeholder="Your Phone Number" required pattern="^[0-9]{10}$" title="Please enter a valid 10-digit phone number">
+
+                <label for="address">Address:</label>
+                <textarea id="address" name="address" placeholder="Your Address" rows="4" required></textarea>
+
+                <label for="photo">Upload Photo (Max size: 1MB):</label>
+                <input type="file" id="photo" name="photo" accept="image/*" required onchange="previewImage(event)">
+                <img id="photoPreview" class="photo-preview" />
+
+                <label for="objective">Objective:</label>
+                <textarea id="objective" name="objective" placeholder="Your Objective" rows="4" required></textarea>
+
+                <h3>Education</h3>
+                <label for="10th">10th School Name:</label>
+                <input type="text" id="10th" name="10th" placeholder="School Name" required>
+
+                <label for="10thYear">10th Year of Passing:</label>
+                <input type="number" id="10thYear" name="10thYear" placeholder="Year of Passing" required>
+
+                <label for="12th">12th College Name:</label>
+                <input type="text" id="12th" name="12th" placeholder="College Name" required>
+
+                <label for="12thYear">12th Year of Passing:</label>
+                <input type="number" id="12thYear" name="12thYear" placeholder="Year of Passing" required>
+
+                <label for="graduation">Graduation University Name:</label>
+                <input type="text" id="graduation" name="graduation" placeholder="University Name" required>
+
+                <label for="graduationYear">Graduation Year of Passing:</label>
+                <input type="number" id="graduationYear" name="graduationYear" placeholder="Year of Passing" required>
+
+                <label for="skills">Skills (Comma Separated):</label>
+                <input type="text" id="skills" name="skills" placeholder="e.g. JavaScript, Python, Communication" required>
+
+                <h3>Select Your Template</h3>
+                <div class="template-selector">
+                    <div class="template-option" id="template1">
+                        <img src="https://cdn-images.zety.com/pages/free_resume_templates_new_1.jpg" alt="Template 1">
+                        <p>Template 1</p>
+                    </div>
+                    <div class="template-option" id="template2">
+                        <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/clean-professional-resume-remplate%2C-resume-cv-design-template-f174de7d3e36ce412980364464f42f2e_screen.jpg?ts=1687848865" alt="Template 2">
+                        <p>Template 2</p>
+                    </div>
+                    <div class="template-option" id="template3">
+                        <img src="https://tse4.mm.bing.net/th?id=OIP.6vs0spZjJuEC1lychNc3_QHaJl&w=1275&h=1650&rs=1&pid=ImgDetMain" alt="Template 3">
+                        <p>Template 3</p>
+                    </div>
+                </div>
+
+                <button type="submit">Generate Resume</button>
+            </form>
+        </section>
+
+        <section class="resume-output" id="resumeOutput">
+            <h2>Your Resume</h2>
+            <div id="resumeDetails"></div>
+            <button class="download-btn" id="downloadBtn">Download Resume</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Resume Builder</p>
+    </footer>
+
+    <script>
+        let selectedTemplate = 'template1';
+
+        // Handle template selection
+        document.querySelectorAll('.template-option').forEach(option => {
+            option.addEventListener('click', function () {
+                document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('selected-template'));
+                this.classList.add('selected-template');
+                selectedTemplate = this.id;
+            });
+        });
+
+        // Image preview function
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const photoPreview = document.getElementById('photoPreview');
+                photoPreview.src = reader.result;
+                photoPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        document.getElementById('resumeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Collect form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const photo = document.getElementById('photo').files[0];
+            const objective = document.getElementById('objective').value;
+            const tenthSchool = document.getElementById('10th').value;
+            const tenthYear = document.getElementById('10thYear').value;
+            const twelfthCollege = document.getElementById('12th').value;
+            const twelfthYear = document.getElementById('12thYear').value;
+            const graduationUniversity = document.getElementById('graduation').value;
+            const graduationYear = document.getElementById('graduationYear').value;
+            const skills = document.getElementById('skills').value.split(',');
+
+            // Create an image element for the photo
+            const photoURL = URL.createObjectURL(photo);
+
+            // Generate the resume content based on the selected template
+            let resumeDetails;
+
+            if (selectedTemplate === 'template1') {
+                resumeDetails = `
+                    <div>
+                        <h3 class="resume-heading">${name}</h3>
+                        <p>Email: ${email}</p>
+                        <p>Phone: ${phone}</p>
+                        <p>Address: ${address}</p>
+                        <p>Objective: ${objective}</p>
+                        <p>10th School: ${tenthSchool} (${tenthYear})</p>
+                        <p>12th College: ${twelfthCollege} (${twelfthYear})</p>
+                        <p>Graduation: ${graduationUniversity} (${graduationYear})</p>
+                        <ul>
+                            <strong>Skills:</strong>
+                            ${skills.map(skill => `<li>${skill.trim()}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else if (selectedTemplate === 'template2') {
+                resumeDetails = `
+                    <div style="background-color: #f0f4f8; padding: 20px;">
+                        <h3>${name}</h3>
+                        <p><strong>Contact:</strong> ${email}, ${phone}</p>
+                        <p><strong>Location:</strong> ${address}</p>
+                        <p><strong>Career Objective:</strong> ${objective}</p>
+                        <div>
+                            <strong>Education:</strong>
+                            <p>${tenthSchool} (${tenthYear}), ${twelfthCollege} (${twelfthYear}), ${graduationUniversity} (${graduationYear})</p>
+                        </div>
+                        <p><strong>Skills:</strong> ${skills.join(', ')}</p>
+                    </div>
+                `;
+            } else if (selectedTemplate === 'template3') {
+                resumeDetails = `
+                    <div style="border: 1px solid #ddd; padding: 20px;">
+                        <h3>${name}</h3>
+                        <p>Email: ${email}</p>
+                        <p>Phone: ${phone}</p>
+                        <p>Address: ${address}</p>
+                        <p>Objective: ${objective}</p>
+                        <p>Education: ${tenthSchool} (${tenthYear}), ${twelfthCollege} (${twelfthYear}), ${graduationUniversity} (${graduationYear})</p>
+                        <p>Skills: ${skills.join(', ')}</p>
+                    </div>
+                `;
+            }
+
+            // Display the resume
+            document.getElementById('resumeDetails').innerHTML = resumeDetails;
+            document.getElementById('resumeOutput').style.display = 'block';
+
+            // Download resume as PDF
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(16);
+                doc.setTextColor(244, 78, 95); // Red color for headings
+                doc.text(`Resume of ${name}`, 20, 20);
+
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0); // Black color for text
+                doc.text(`Email: ${email}`, 20, 30);
+                doc.text(`Phone: ${phone}`, 20, 35);
+                doc.text(`Address: ${address}`, 20, 40);
+                doc.text(`Objective: ${objective}`, 20, 45);
+                doc.text(`10th School: ${tenthSchool} - ${tenthYear}`, 20, 50);
+                doc.text(`12th College: ${twelfthCollege} - ${twelfthYear}`, 20, 55);
+                doc.text(`Graduation University: ${graduationUniversity} - ${graduationYear}`, 20, 60);
+
+                doc.text(`Skills: ${skills.join(', ')}`, 20, 65);
+
+                doc.addImage(photoURL, 'JPEG', 160, 20, 40, 40); // Passport-size photo at top right corner
+                
+                doc.save(`${name}_Resume.pdf`);
+            });
+        });
+    </script>
+</body>
+</html>
